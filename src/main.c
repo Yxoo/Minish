@@ -157,7 +157,7 @@ char	*command_preparsing(char *entry)
 	commands = pipe_split_command(entry);
 	while (commands[command_id])
 	{
-
+		
 	}
 	init_quoted(&quote);
 }

@@ -21,15 +21,16 @@
 # include <sys/wait.h>
 # include <readline/readline.h>
 # include <readline/history.h>
+# include "error.h"
 
 /*------------------------------------Struct----------------------------------*/
 
 typedef struct s_command
 {
-	char	*command;
+	char	**command;
 	char	**args;
-	char	redirect;
-	int		*files;
+	char	**redirect;
+	int		**files;
 }	t_command;
 
 typedef enum e_bool
@@ -44,6 +45,8 @@ typedef struct s_quoted
 	int 	start;
 	int		end;
 }	t_quoted;
+
+typedef const char			*t_err;
 
 /*------------------------------------Utils-----------------------------------*/
 

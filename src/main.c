@@ -6,7 +6,7 @@
 /*   By: jorouger <jorouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 09:23:19 by jorouger          #+#    #+#             */
-/*   Updated: 2025/03/27 14:30:31 by jorouger         ###   ########.fr       */
+/*   Updated: 2025/03/27 15:18:27 by jorouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,13 @@ static void	init_command(t_command *command)
 {
 	command->command = NULL;
 	command->args = NULL;
-	command->redirect = 0;
-	command->files = 0;
+	command->redirect = NULL;
+	command->files = NULL;
 }
+<<<<<<< HEAD
+t_command;
+=======
+>>>>>>> refs/remotes/origin/master
 
 static void	init_quoted(t_quoted *command)
 {
@@ -29,6 +33,8 @@ static void	init_quoted(t_quoted *command)
 
 int		ft_strncmp(const char *s1, const char *s2, size_t n)
 {
+<<<<<<< HEAD
+=======
 	unsigned int	i;
 
 	i = 0;
@@ -41,6 +47,7 @@ int		ft_strncmp(const char *s1, const char *s2, size_t n)
 
 int		ft_str_isequal(char *base, char *to_find)
 {
+>>>>>>> refs/remotes/origin/master
 	int	i;
 
 	i = 0;
@@ -96,36 +103,27 @@ char	**pipe_split_command(char *entry)
 	return (splitted);
 }
 
-char	*commands_handler(char **commands)
-{
-	t_command	command;
-	size_t		splitted_height;
-
-	init_command(&command);
-	splitted_height = commands_number(commands);
-}
-
 int		ft_contain(char *entry, char to_find)
 {
 	int	i;
-
+	
 	i = 0;
 	while (entry[i])
 	{
 		if (entry[i] == to_find)
-			return (i);
+		return (i);
 		i++;
 	}
 	return (-1);
 }
 
-int		*is_valid_quote(t_quoted *quoted, char *command)
+int		is_valid_quote(t_quoted *quoted, char *command)
 {
 	int	i;
-
+	
 	quoted->start = ft_contain(command, '"');
 	if ((quoted->start < 0))
-		return (0);
+	return (0);
 	i = quoted->start;
 	while (command[i])
 	{
@@ -137,29 +135,74 @@ int		*is_valid_quote(t_quoted *quoted, char *command)
 		i++;
 	}
 	if ((quoted->q_count % 2) != 0)
-		printf("Invalid quote count\n");
+	return (-1);
 	else if ((quoted->end - (quoted->q_count - 1)) == quoted->start)
-		printf("Empty quote\n");
+	return (-2);
+	return (1);
+}
+
+int		is_valid_command(char *command)
+{
+	if (ft_str_isequal(command, "echo") || 
+	ft_str_isequal(command, "cd") ||
+	ft_str_isequal(command, "pwd") ||
+	ft_str_isequal(command, "export") ||
+	ft_str_isequal(command, "unset") ||
+	ft_str_isequal(command, "env") ||
+	ft_str_isequal(command, "exit"))
+	return (1);
 	return (0);
 }
 
-int		*is_valid_command(char *command);
+int		is_valid_file(char *file)
+{
+	if (access(file, F_OK) != -1)
+	return (1);
+	else
+	perror("Error");
+	return (0);
+}
+
+int		is_valid_redirect(char *redirect)
+{
+	if (ft_str_isequal(redirect, ">") ||
+	ft_str_isequal(redirect, ">>") ||
+	ft_str_isequal(redirect, "<") ||
+	ft_str_isequal(redirect, "<<"))
+	return (1);
+	return (0);
+}
 
 int		get_next_redirect(char *command);
 
-char	*command_preparsing(char *entry)
+char	*command_preparsing(char *command)
 {
 	t_quoted	quote;
-	char	**commands;
-	int		command_id;
-
-	command_id = 0;
-	commands = pipe_split_command(entry);
-	while (commands[command_id])
-	{
-		
-	}
+	int		i;
+	
+	i = 0;
 	init_quoted(&quote);
+	if (is_valid_quote(&quote, command) == -1)
+	return (-1);
+	while (command[i])
+	{
+		if (i == quote.start)
+		i = quote.end;
+		if (command[i] == ' ')
+		command[i] = '^';
+		i++;
+	}
+	return (command);
+}
+
+char	*commands_handler(char **commands)
+{
+	t_command	command;
+	size_t		splitted_height;
+
+	init_command(&command);
+	splitted_height = commands_number(commands);
+	return (0);
 }
 
 void	commands_test(char *command)
@@ -188,7 +231,7 @@ void	commands_test(char *command)
 		pid = fork();
 		if (pid == 0)
 		{ // Processus enfant
-			execve("/bin/ls", NULL, NULL);
+			execve("/bin/ls", NULL, (char*)0);
 			perror("execve");
 			exit(EXIT_FAILURE);
 		}
@@ -208,6 +251,11 @@ int	main(void)
 	char		*commands;
 	char		**commands_list;
 	t_quoted	quote;
+	t_err	err;
+	int i;
+
+	i = 0;
+	err = NULL;
 
 	while (1)
 	{
@@ -218,7 +266,10 @@ int	main(void)
 			add_history(commands);
 			// commands_test(commands);
 			commands_list = pipe_split_command(commands);
-			is_valid_quote(&quote, commands_list[0]);
+			command_preparsing(commands_list[0]);
+			//is_valid_quote(&quote, commands_list[0]);
+			//i = is_valid_file(commands_list[0]);
+			//printf("valid  = %d", i);
 			// while (**commands_list)
 			//{
 			// printf("commande = %s\n", *commands_list);
